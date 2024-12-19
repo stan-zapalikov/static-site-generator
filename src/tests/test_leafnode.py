@@ -1,16 +1,7 @@
 import unittest
-from htmlnode import HTMLNode, LeafNode
+from src.leafnode import LeafNode
 
 class TestHTMLNode(unittest.TestCase):
-    def testPropsToHtml(self):
-        node = HTMLNode("","",[], {"href":"google", "color": 70310})
-        self.assertEqual(node.props_to_html(), " href=\"google\" color=\"70310\"")
-
-    def testRepr(self):
-        node = HTMLNode("", "", [], {})
-        node2 = HTMLNode("", "", [], {})
-        self.assertEqual(repr(node), repr(node2))
-
     def testLeafToHtml(self):
         node = LeafNode("p", "Test", {"href":"link.com"})
         correctResult = "<p href=\"link.com\">Test</p>"
