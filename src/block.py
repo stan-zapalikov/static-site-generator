@@ -24,3 +24,6 @@ def block_to_block_type(block):
         return "quote"
     else:
         return "paragraph"
+
+def markdown_to_html_node(markdown):
+    pass
