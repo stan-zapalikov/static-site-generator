@@ -33,7 +33,7 @@ def markdown_to_heading(block):
         if char != '#':
             break
         headingCounter += 1
-    return LeafNode(f"h{headingCounter}", block[headingCounter-1:])
+    return LeafNode(f"h{headingCounter}", block[headingCounter+1:])
 
 def markdown_to_code(block):
     return ParentNode("pre", [LeafNode("code", block[3:-3])])
@@ -43,6 +43,13 @@ def markdown_to_quote(block):
 
 def markdown_to_paragraph(block):
     return LeafNode("p", block)
+
+def markdown_to_ul(block):
+    list_items = block.split("\n")
+    for li in list_items:
+        li = li[2:]
+    
+
 
 
 def markdown_to_html_node(markdown):

@@ -1,5 +1,5 @@
 import unittest
-from src.block import markdown_to_blocks, block_to_block_type
+from src.block import *
 
 class TestBlock(unittest.TestCase):
     def testMdToBlockProper(self):
@@ -39,6 +39,15 @@ class TestBlock(unittest.TestCase):
     def testBlockToBlockTypeQuote(self):
         text = "> This is a quote"
         self.assertEqual(block_to_block_type(text), "quote")
+
+    def testMarkdownToHeading1(self):
+        self.assertEqual(repr(markdown_to_heading("# Test")), repr(LeafNode("h1", "Test")))
+    
+    def testMarkdownToCode(self):
+        #tbd
+        pass
+        
+
 
 if __name__ == '__main__':
     unittest.main()
