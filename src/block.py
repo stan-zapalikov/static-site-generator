@@ -1,4 +1,6 @@
 import re
+from .parentnode import ParentNode
+from .leafnode import LeafNode
 
 def markdown_to_blocks(text):
     tempBlocks = text.split("\n\n")
@@ -24,6 +26,24 @@ def block_to_block_type(block):
         return "quote"
     else:
         return "paragraph"
+    
+def markdown_to_heading(block):
+    headingCounter = 0
+    for char in block:
+        if char != '#':
+            break
+        headingCounter += 1
+    return LeafNode(f"h{headingCounter}", block[headingCounter-1:])
+
+def markdown_to_code(block):
+    return ParentNode("pre", [LeafNode("code", block[3:-3])])
+
+def markdown_to_quote(block):
+    return LeafNode("blockquote", block[2:])
+
+def markdown_to_paragraph(block):
+    return LeafNode("p", block)
+
 
 def markdown_to_html_node(markdown):
     pass
