@@ -84,5 +84,6 @@ class TestDelimiter(unittest.TestCase):
         self.assertEqual(textNodes, result)
 
 
+
 if __name__=='__main__':
     unittest.main()
