@@ -1,9 +1,6 @@
 import os
 import shutil
-from .textnode import TextNode, TextType
-from .htmlnode import HTMLNode
-from .leafnode import LeafNode
-from .parentnode import ParentNode
+from src.leafnode import LeafNode
 
 def main():
     if (os.path.exists('public')):
@@ -21,5 +18,12 @@ def copy_static(source, destination):
         if os.path.isdir(source_path):
             os.mkdir(dest_path)
             copy_static(source_path, dest_path)
+
+def extract_title(markdown):
+    firstLine = markdown.split("\n")[0]
+    if (firstLine[0] != "#"):
+        raise Exception("No title found")
+    return LeafNode("h1", firstLine[2:])
+
 
 main()

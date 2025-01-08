@@ -1,4 +1,6 @@
 import re
+from .inline import text_to_textnodes
+from .textnode import text_node_to_html_node
 from .parentnode import ParentNode
 from .leafnode import LeafNode
 
@@ -26,41 +28,61 @@ def block_to_block_type(block):
         return markdown_to_quote(block)
     else:
         return markdown_to_paragraph(block)
-    
+
 def markdown_to_heading(block):
     headingCounter = 0
     for char in block:
         if char != '#':
             break
         headingCounter += 1
-    return LeafNode(f"h{headingCounter}", block[headingCounter+1:])
+    if headingCounter >= len(block):
+        raise ValueError(f"Invalid heading level: {headingCounter}")
+    return ParentNode(f"h{headingCounter}", text_to_children(block[headingCounter+1:]))
 
 def markdown_to_code(block):
-    return ParentNode("pre", [LeafNode("code", block[3:-3])])
+    return ParentNode("pre", [ParentNode("code", text_to_children(block[3:-3]))])
 
 def markdown_to_quote(block):
+    lines = block.split("\n")
+    new_items = []
+    for line in lines:
+        if not line.startswith("> "):
+            raise ValueError("Invalid quote block")
+        # TODO finish
+
     return LeafNode("blockquote", block[2:])
 
 def markdown_to_paragraph(block):
-    return LeafNode("p", block)
+    lines = block.split("\n")
+    paragraph = " ".join(lines)
+    children = text_to_children(paragraph)
+    return ParentNode("p", children)
 
 def markdown_to_ul(block):
     list_items = block.split("\n")
     html_li = []
     for li in list_items:
-        html_li.append(LeafNode("li", li[2:]))
+        html_li.append(ParentNode("li", text_to_children(li[2:])))
     return ParentNode("ul", html_li)
 
 def markdown_to_ol(block):
     list_items = block.split("\n")
     html_li = []
     for li in list_items:
-        html_li.append(LeafNode("li", li[3:]))
+        html_li.append(ParentNode("li", text_to_children(li[3:])))
     return ParentNode("ol", html_li)
-    
+
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
     contents = []
     for block in blocks:
         contents.append(block_to_block_type(block))
-    return ParentNode("div", contents)
+    return ParentNode("div", contents, None)
+
+def text_to_children(text):
+    text_nodes = text_to_textnodes(text)
+    children = []
+    for text_node in text_nodes:
+        html_node = text_node_to_html_node(text_node)
+        children.append(html_node)
+    return children
