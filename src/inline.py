@@ -92,8 +92,3 @@ def text_to_textnodes(text):
     new_nodes = split_nodes_delimiter(new_nodes, "*", TextType.ITALIC)
     new_nodes = split_nodes_delimiter(new_nodes, "`", TextType.CODE)
     return new_nodes
-
-def textnodes_to_html(text_nodes):
-    pass
-        
-

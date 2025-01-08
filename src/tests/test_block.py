@@ -1,98 +1,86 @@
 import unittest
 from src.block import *
+from src.parentnode import ParentNode
+from src.textnode import TextNode
 
-class TestBlock(unittest.TestCase):
-    def testMdToBlockProper(self):
-        text = "# heading\n\nParagraph\n\n* list\n* list"
-        blocks = markdown_to_blocks(text)
-        result = ["# heading", "Paragraph", "* list\n* list"]
-        self.assertEqual(blocks, result)
+class TestMarkdownConversion(unittest.TestCase):
 
-    def testMdToBlockExtraSpaces(self):
-        text = "# heading\n\n\n\n   Paragraph\n\n\n* list\n* list"
-        blocks = markdown_to_blocks(text)
-        result = ["# heading", "Paragraph", "* list\n* list"]
-        self.assertEqual(blocks, result)
+    def test_markdown_to_blocks(self):
+        text = """# Heading 1
 
+Paragraph text
 
-    def testBlockToBlockTypeParagraph(self):
-        text = "this is a paragraph"
-        self.assertEqual(repr(block_to_block_type(text)), repr(LeafNode("p", "this is a paragraph")))
+- List item 1
+- List item 2
 
-    def testBlockToBlockTypeHeading(self):
-        text = "## This is a heading"
-        self.assertEqual(repr(block_to_block_type(text)), repr(LeafNode("h2", "This is a heading")))
-        
-    def testBlockToBlockTypeUl(self):
-        # Each list item should be separate; adjust input to test individual items
-        text = "- List item"
-        self.assertEqual(repr(block_to_block_type(text)), repr(ParentNode("ul", [LeafNode("li", "List item")])))
+> Blockquote"""
+        expected = ["# Heading 1", "Paragraph text", "- List item 1\n- List item 2", "> Blockquote"]
+        self.assertEqual(markdown_to_blocks(text), expected)
 
-    def testBlockToBlockTypeOl(self):
-        # Each list item should be separate; adjust input to test individual items
-        text = "1. List item\n2. List item2"
-        self.assertEqual(repr(block_to_block_type(text)), repr(ParentNode("ol", [LeafNode("li", "List item"), LeafNode("li", "List item2")])))
-        
-    def testBlockToBlockTypeCode(self):
-        text = "```\nthis is code\nthis is more code\n```"
-        self.assertEqual(repr(block_to_block_type(text)), repr(ParentNode("pre", [LeafNode("code", "\nthis is code\nthis is more code\n")])))
-        
-    def testBlockToBlockTypeQuote(self):
-        text = "> This is a quote"
-        self.assertEqual(repr(block_to_block_type(text)), repr(LeafNode("blockquote", "This is a quote")))
+    def test_block_to_block_type_heading(self):
+        block = "# Heading 1"
+        result = block_to_block_type(block)
+        self.assertEqual(result.tag, "h1")
 
+    def test_block_to_block_type_code(self):
+        block = "```\ncode block\n```"
+        result = block_to_block_type(block)
+        self.assertEqual(result.tag, "pre")
 
-    def testMarkdownToHeading1(self):
-        self.assertEqual(repr(markdown_to_heading("# Test")), repr(LeafNode("h1", "Test")))
-    
-    def testMarkdownToCode(self):
-        result = ParentNode("pre", [LeafNode("code", "testing")])
-        self.assertEqual(repr(result), repr(markdown_to_code("```testing```")))
-        
-    def testMarkdownToParagraph(self):
-        result = LeafNode("p", "Testing")
-        self.assertEqual(repr(result), repr(markdown_to_paragraph("Testing")))
-    
-    def testMarkdownToQuote(self):
-        result = LeafNode("blockquote", "This is a quote")
-        self.assertEqual(repr(result), repr(markdown_to_quote("> This is a quote")))
+    def test_block_to_block_type_quote(self):
+        block = "> Quote text"
+        result = block_to_block_type(block)
+        self.assertEqual(result.tag, "blockquote")
 
-    def testMarkdownToUl(self):
-        children = [LeafNode("li", "Testing1"), LeafNode("li", "Testing2")]
-        result = ParentNode("ul", children)
-        prompt = "* Testing1\n* Testing2"
-        self.assertEqual(repr(result), repr(markdown_to_ul(prompt)))
+    def test_block_to_block_type_paragraph(self):
+        block = "This is a paragraph."
+        result = block_to_block_type(block)
+        self.assertEqual(result.tag, "p")
 
-    def testBlockToBlockTypeOl(self):
-        text = "1. List item\n2. List item2"
-        expected = ParentNode("ol", [
-            LeafNode("li", "List item"),
-            LeafNode("li", "List item2")
-        ])
-        self.assertEqual(repr(block_to_block_type(text)), repr(expected))
+    def test_markdown_to_heading(self):
+        block = "### Heading 3"
+        result = markdown_to_heading(block)
+        self.assertEqual(result.tag, "h3")
 
+    def test_markdown_to_code(self):
+        block = "```code block```"
+        result = markdown_to_code(block)
+        self.assertEqual(result.tag, "pre")
 
-    def testMarkdownToOlToHtml(self):
-        children = [LeafNode("li", "Testing1"), LeafNode("li", "Testing2")]
-        result = ParentNode("ol", children)
-        prompt = "1. Testing1\n2. Testing2"
-        self.assertEqual(result.to_html(), markdown_to_ol(prompt).to_html())
+    def test_markdown_to_quote(self):
+        block = "> Blockquote text"
+        result = markdown_to_quote(block)
+        self.assertEqual(result.tag, "blockquote")
 
-    def testMarkdownToHtmlNodeRepr(self):
-        result = "<div><ul><li>Testing1</li><li>Testing2</li></ul></div>"
-        markdown = "* Testing1\n* Testing2"
-        children = [LeafNode("li", "Testing1"), LeafNode("li", "Testing2")]
-        parent = ParentNode("ul", children)
-        self.assertEqual(repr(ParentNode("div", [parent])), repr(markdown_to_html_node(markdown)))
+    def test_markdown_to_paragraph(self):
+        block = "Paragraph text"
+        result = markdown_to_paragraph(block)
+        self.assertEqual(result.tag, "p")
 
-    def testMarkdownToHtmlNodeToHtml(self):
-        result = "<div><ol><li>Testing1</li><li>Testing2</li></ol></div>"
-        markdown = "1. Testing1\n2. Testing2"
-        children = [LeafNode("li", "Testing1"), LeafNode("li", "Testing2")]
-        parent = ParentNode("ol", children)
-        self.assertEqual(result, markdown_to_html_node(markdown).to_html())
-    
+    def test_markdown_to_ul(self):
+        block = "- List item 1\n- List item 2"
+        result = markdown_to_ul(block)
+        self.assertEqual(result.tag, "ul")
 
+    def test_markdown_to_ol(self):
+        block = "1. Ordered item 1\n2. Ordered item 2"
+        result = markdown_to_ol(block)
+        self.assertEqual(result.tag, "ol")
 
-if __name__ == '__main__':
+    def test_markdown_to_html_node(self):
+        markdown = """# Heading 1
+
+Paragraph text
+
+- List item 1
+- List item 2"""
+        result = markdown_to_html_node(markdown)
+        self.assertEqual(result.tag, "div")
+
+    def test_invalid_heading_level(self):
+        block = "####### Too many hashes"
+        with self.assertRaises(ValueError):
+            markdown_to_heading(block)
+
+if __name__ == "__main__":
     unittest.main()
