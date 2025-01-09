@@ -1,8 +1,8 @@
 import re
-from .inline import text_to_textnodes
-from .textnode import TextNode
-from .parentnode import ParentNode
-from .leafnode import LeafNode
+from inline import text_to_textnodes
+from textnode import TextNode
+from parentnode import ParentNode
+from leafnode import LeafNode
 
 def markdown_to_blocks(text):
     tempBlocks = text.split("\n\n")

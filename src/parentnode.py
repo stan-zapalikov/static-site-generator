@@ -1,4 +1,4 @@
-from .htmlnode import HTMLNode
+from htmlnode import HTMLNode
 
 class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
@@ -6,9 +6,9 @@ class ParentNode(HTMLNode):
 
     # recursive method to return full html tag of the node and its children
     def to_html(self):
-        if (not self.tag):
+        if (self.tag is None):
             raise ValueError("Missing tag")
-        if (not self.children):
+        if (self.children is None):
             raise ValueError("Missing children")
         childNodes = ""
         for child in self.children:

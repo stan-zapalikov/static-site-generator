@@ -1,6 +1,7 @@
 import os
 import shutil
-from src.leafnode import LeafNode
+from leafnode import LeafNode
+from block import markdown_to_html_node
 
 def main():
     if (os.path.exists('public')):
@@ -8,6 +9,7 @@ def main():
     os.mkdir('public')
 
     copy_static('static', 'public')
+    generate_page("content/index.md", "template.html", "public/index.html")
 
 def copy_static(source, destination):
     for item in os.listdir(source):
@@ -19,11 +21,37 @@ def copy_static(source, destination):
             os.mkdir(dest_path)
             copy_static(source_path, dest_path)
 
-def extract_title(markdown):
-    firstLine = markdown.split("\n")[0]
-    if (firstLine[0] != "#"):
-        raise Exception("No title found")
-    return LeafNode("h1", firstLine[2:])
+def extract_title(md):
+    lines = md.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line[2:]
+    raise ValueError("No title found")
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    text_from_file = ""
+    html_template = ""
+    with open(from_path, "r") as mdFile:
+        text_from_file = mdFile.read()
+    with open(template_path, "r") as template:
+        html_template = template.read()
+    converted_text = markdown_to_html_node(text_from_file).to_html()
+    title = extract_title(text_from_file)
+    html_template = html_template.replace("{{ Title }}", title)
+    html_template = html_template.replace("{{ Content }}", converted_text)
+
+    dest_dir_path = os.path.dirname(dest_path)
+    if dest_dir_path != "":
+        os.makedirs(dest_dir_path, exist_ok=True)
+    with open(dest_path, "w") as to_file:
+        to_file.write(html_template)
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    pass
+    #TODO
+
+
 
 
 main()
