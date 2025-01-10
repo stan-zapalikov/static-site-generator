@@ -9,7 +9,7 @@ def main():
     os.mkdir('public')
 
     copy_static('static', 'public')
-    generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive("content/", "template.html", "public/")
 
 def copy_static(source, destination):
     for item in os.listdir(source):
@@ -48,8 +48,14 @@ def generate_page(from_path, template_path, dest_path):
         to_file.write(html_template)
 
 def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
-    pass
-    #TODO
+    for item in os.listdir(dir_path_content):
+        source_path = os.path.join(dir_path_content, item)
+        dest_path = os.path.join(dest_dir_path, item)
+        if os.path.isfile(source_path):
+            generate_page(source_path, template_path, dest_path[:-2] + "html")
+        if os.path.isdir(source_path):
+            os.mkdir(dest_path)
+            generate_pages_recursive(source_path, template_path, dest_path)
 
 
 
