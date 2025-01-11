@@ -1,5 +1,5 @@
 # Static Site Generator
-Converts Markdown files to HTML pages given an HTML and CSS template
+Static website builder that takes Markdown files as input to produce web pages. 
 
 # Installation
 Place contents and pages into ```content/```. Place static items like images and CSS template to ```static/```.
